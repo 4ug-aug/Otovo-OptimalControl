@@ -8,6 +8,7 @@ Created on Wed Feb 16 15:35:11 2022
 import pandas as pd
 import matplotlib.pyplot as plt
 import dask.dataframe as dd
+from load_data import load_dataset
 
 dtype={'adjusts_id': 'object',
        'ediel_product_code': 'float64',
@@ -15,7 +16,9 @@ dtype={'adjusts_id': 'object',
        'parent_id': 'object'}
 
 df_main = pd.read_csv('/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/meter_ids_data/3ba47f27-33e8-4764-a390-d33ca37d625f.csv', 
-delimiter=',', header=0)
+                        delimiter=',', header=0)
+
+df_whole = load_dataset("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/gridtx-dump.csv")
 
 def plot_timeslot():
     df_copy = df_main
@@ -69,9 +72,20 @@ def plot_timeslot():
 
     plt.show();
 
+def describe_whole_dataset():
+    df_copy = df_whole
+    print("Missing values in the dataset based on columns:")
+    nans = df_copy.isnull().sum().compute()
+    print(nans)
+    print(f"Total nans: {nans.sum()}")
+
+    print("Different sized meter_id occurences")
+    value_counts_ = df_copy["meter_id"].value_counts().compute()
+    print(value_counts_)
+
 
 if __name__ == "__main__":
-    plot_timeslot()
+    describe_whole_dataset()
 
 
 
