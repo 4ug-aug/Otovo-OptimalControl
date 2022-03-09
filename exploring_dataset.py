@@ -31,42 +31,48 @@ def plot_timeslot():
 
     dtextract('created_at')
 
-    fig, ((axs1, axs2), (axs3, axs4)) = plt.subplots(2,2)
+    fig, axs = plt.subplots(nrows = 3, ncols = 2)
     df2 = df_copy[df_copy['type']=='production']
     df3 = df_copy[df_copy['type']=='consumption']
     df4 = df_copy[df_copy['type']=='elcert']
 
-    axs1.plot(df2.groupby(df2['month'])["num_kwh"].mean(), color = 'green')
-    axs1.plot(df3.groupby(df3['month'])["num_kwh"].mean(), color = 'red')
-    axs1.plot(df4.groupby(df4['month'])["num_kwh"].mean(), color = 'blue')
-    axs1.set_title("Monthly")
-    axs1.legend(["production","consumption","elcert"])
+    axs[0,0].plot(df2.groupby(df2['month'])["num_kwh"].mean(), color = 'green')
+    axs[0,0].plot(df3.groupby(df3['month'])["num_kwh"].mean(), color = 'red')
+    axs[0,0].plot(df4.groupby(df4['month'])["num_kwh"].mean(), color = 'blue')
+    axs[0,0].set_title("Monthly", fontsize=10)
+    axs[0,0].legend(["production","consumption","elcert"])
 
-    axs2.plot(df2.groupby(df2['weekday'])["num_kwh"].mean(), color = 'green')
-    axs2.plot(df3.groupby(df3['weekday'])["num_kwh"].mean(), color = 'red')
-    axs2.plot(df4.groupby(df4['weekday'])["num_kwh"].mean(), color = 'blue')
-    axs2.set_title("Weekday")
-    axs2.legend(["production","consumption","elcert"])
+    axs[0,1].plot(df2.groupby(df2['weekday'])["num_kwh"].mean(), color = 'green')
+    axs[0,1].plot(df3.groupby(df3['weekday'])["num_kwh"].mean(), color = 'red')
+    axs[0,1].plot(df4.groupby(df4['weekday'])["num_kwh"].mean(), color = 'blue')
+    axs[0,1].set_title("Weekday", fontsize=10)
+    axs[0,1].legend(["production","consumption","elcert"])
 
-    axs3.plot(df2.groupby(df2['hour'])["num_kwh"].mean(), color = 'green')
-    axs3.plot(df3.groupby(df3['hour'])["num_kwh"].mean(), color = 'red')
-    axs3.plot(df4.groupby(df4['hour'])["num_kwh"].mean(), color = 'blue')
-    axs3.set_title("Hourly")
-    axs3.legend(["production","consumption","elcert"])
+    axs[1,0].plot(df2.groupby(df2['hour'])["num_kwh"].mean(), color = 'green')
+    axs[1,0].plot(df3.groupby(df3['hour'])["num_kwh"].mean(), color = 'red')
+    axs[1,0].plot(df4.groupby(df4['hour'])["num_kwh"].mean(), color = 'blue')
+    axs[1,0].set_title("Hourly", fontsize=10)
+    axs[1,0].legend(["production","consumption","elcert"])
 
-    axs4.plot(df2.groupby(df2['weekly'])["num_kwh"].mean(), color = 'green')
-    axs4.plot(df3.groupby(df3['weekly'])["num_kwh"].mean(), color = 'red')
-    axs4.plot(df4.groupby(df4['weekly'])["num_kwh"].mean(), color = 'blue')
-    axs4.set_title("Weekly")
-    axs4.legend(["production","consumption","elcert"])
+    axs[1,1].plot(df2.groupby(df2['weekly'])["num_kwh"].mean(), color = 'green')
+    axs[1,1].plot(df3.groupby(df3['weekly'])["num_kwh"].mean(), color = 'red')
+    axs[1,1].plot(df4.groupby(df4['weekly'])["num_kwh"].mean(), color = 'blue')
+    axs[1,1].set_title("Weekly", fontsize=10)
+    axs[1,1].legend(["production","consumption","elcert"])
     
+    axs[2,0].plot(df3.groupby(df3['weekly'])["num_kwh"].mean(), color = 'red')
+    axs[2,0].plot(df3.groupby(df3['weekly'])["amount_no_vat"].mean(), color = 'green')
+    axs[2,0].set_title("Amount no VAT vs Consumption", fontsize=10)
+    axs[2,0].legend(["Consumption","Spot Price"])
 
-    # df2.groupby(df2['weekday'])["num_kwh"].mean().plot(kind='bar', rot=0, ax=axs)
+    axs[2,1].remove()
+
     plt.show();
 
 
 if __name__ == "__main__":
     plot_timeslot()
+
 
 
 
