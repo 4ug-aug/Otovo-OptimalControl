@@ -5,20 +5,21 @@ Created on Wed Feb 16 15:35:11 2022
 @author: vidis
 """
 
-from cProfile import label
-from unicodedata import name
 import pandas as pd
-import dask.dataframe as dd
 import matplotlib.pyplot as plt
-import datetime as dt
-import pytz
+import dask.dataframe as dd
 
-df_main = pd.read_csv('sample-csv.csv', delimiter=';', header=0)
+dtype={'adjusts_id': 'object',
+       'ediel_product_code': 'float64',
+       'invoice_item_id': 'object',
+       'parent_id': 'object'}
 
+df_main = pd.read_csv('/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/meter_ids_data/3ba47f27-33e8-4764-a390-d33ca37d625f.csv', 
+delimiter=',', header=0)
 
 def plot_timeslot():
-    df_copy = df_main.copy()
-    df_copy = df_main.drop(['id'], axis=1)
+    df_copy = df_main
+    print(df_copy.columns)
 
     def dtextract(x):
         df_copy[x] = pd.to_datetime(df_copy[x], utc=True)
@@ -28,8 +29,7 @@ def plot_timeslot():
         df_copy['hour'] = df_copy[x].dt.hour
         df_copy['weekday'] = df_copy[x].dt.weekday
 
-
-    dtextract('timeslot')
+    dtextract('created_at')
 
     fig, ((axs1, axs2), (axs3, axs4)) = plt.subplots(2,2)
     df2 = df_copy[df_copy['type']=='production']
