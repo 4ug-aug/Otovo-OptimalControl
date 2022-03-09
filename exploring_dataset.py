@@ -5,13 +5,15 @@ Created on Wed Feb 16 15:35:11 2022
 @author: vidis
 """
 
+from cProfile import label
+from unicodedata import name
 import pandas as pd
 import dask.dataframe as dd
 import matplotlib.pyplot as plt
 import datetime as dt
 import pytz
 
-df_main = pd.read_csv('sample-csv', delimiter=';', header=0)
+df_main = pd.read_csv('sample-csv.csv', delimiter=';', header=0)
 
 
 def plot_timeslot():
@@ -20,7 +22,8 @@ def plot_timeslot():
 
     def dtextract(x):
         df_copy[x] = pd.to_datetime(df_copy[x], utc=True)
-        df_copy['year'] = df_copy[x].dt.year
+        df_copy["year"] = df_copy[x].dt.year
+        df_copy["weekly"] = df_copy[x].dt.isocalendar().week
         df_copy['month'] = df_copy[x].dt.month
         df_copy['hour'] = df_copy[x].dt.hour
         df_copy['weekday'] = df_copy[x].dt.weekday
@@ -28,16 +31,38 @@ def plot_timeslot():
 
     dtextract('timeslot')
 
-    fig, axs = plt.subplots(figsize=(12, 4))
+    fig, ((axs1, axs2), (axs3, axs4)) = plt.subplots(2,2)
     df2 = df_copy[df_copy['type']=='production']
     df3 = df_copy[df_copy['type']=='consumption']
     df4 = df_copy[df_copy['type']=='elcert']
-    plt.plot(df2.groupby(df2['weekday'])["num_kwh"].mean(), color = 'green')
-    plt.plot(df3.groupby(df3['weekday'])["num_kwh"].mean(), color = 'red')
-    plt.plot(df4.groupby(df4['weekday'])["num_kwh"].mean(), color = 'blue')
 
+    axs1.plot(df2.groupby(df2['month'])["num_kwh"].mean(), color = 'green')
+    axs1.plot(df3.groupby(df3['month'])["num_kwh"].mean(), color = 'red')
+    axs1.plot(df4.groupby(df4['month'])["num_kwh"].mean(), color = 'blue')
+    axs1.set_title("Monthly")
+    axs1.legend(["production","consumption","elcert"])
 
-    df2.groupby(df2['weekday'])["num_kwh"].mean().plot(kind='bar', rot=0, ax=axs)
+    axs2.plot(df2.groupby(df2['weekday'])["num_kwh"].mean(), color = 'green')
+    axs2.plot(df3.groupby(df3['weekday'])["num_kwh"].mean(), color = 'red')
+    axs2.plot(df4.groupby(df4['weekday'])["num_kwh"].mean(), color = 'blue')
+    axs2.set_title("Weekday")
+    axs2.legend(["production","consumption","elcert"])
+
+    axs3.plot(df2.groupby(df2['hour'])["num_kwh"].mean(), color = 'green')
+    axs3.plot(df3.groupby(df3['hour'])["num_kwh"].mean(), color = 'red')
+    axs3.plot(df4.groupby(df4['hour'])["num_kwh"].mean(), color = 'blue')
+    axs3.set_title("Hourly")
+    axs3.legend(["production","consumption","elcert"])
+
+    axs4.plot(df2.groupby(df2['weekly'])["num_kwh"].mean(), color = 'green')
+    axs4.plot(df3.groupby(df3['weekly'])["num_kwh"].mean(), color = 'red')
+    axs4.plot(df4.groupby(df4['weekly'])["num_kwh"].mean(), color = 'blue')
+    axs4.set_title("Weekly")
+    axs4.legend(["production","consumption","elcert"])
+    
+
+    # df2.groupby(df2['weekday'])["num_kwh"].mean().plot(kind='bar', rot=0, ax=axs)
+    plt.show();
 
 
 if __name__ == "__main__":
