@@ -7,6 +7,7 @@ Created on Wed Feb 16 15:35:11 2022
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 import dask.dataframe as dd
 from load_data import load_dataset
 
@@ -83,9 +84,14 @@ def describe_whole_dataset():
     value_counts_ = df_copy["meter_id"].value_counts().compute()
     print(value_counts_)
 
+def distribution_of_measurements():
+    df_copy = df_whole
+    value_counts_ = df_copy["meter_id"].value_counts().compute()
+    plot = px.histogram(value_counts_, x="meter_id")
+    plot.show();
 
 if __name__ == "__main__":
-    describe_whole_dataset()
+    distribution_of_measurements()
 
 
 
