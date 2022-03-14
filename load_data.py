@@ -1,9 +1,5 @@
 # Python script to load the dataset
 
-from operator import index
-from posixpath import split
-
-
 def load_dataset(fp):
     """Takes the filepath of our dataset and returns a Dask Dataframe
 
@@ -41,6 +37,42 @@ def split_dataset(meter_id):
 
     return None
 
+def create_datasets_from_meter_id():
+    import pandas as pd
+    from tqdm import tqdm
+
+    threshold = 1e5
+
+    print(df.head())
+    # unique_meter_ids = df["meter_id"].unique().map_partitions(pd.Series.unique)
+    value_counts_ = df["meter_id"].value_counts()
+    unique_meter_ids_as_frame = value_counts_.to_frame("count").reset_index().rename(columns={"index": 'meter-ids'})
+    meter_ids_thresholded = unique_meter_ids_as_frame[unique_meter_ids_as_frame["count"] > threshold]["meter-ids"].compute()
+    
+    print(f"Creating datasets for {len(meter_ids_thresholded)} unique meter ids")
+    for meter in tqdm(meter_ids_thresholded):
+        split_dataset(meter)
+
+def merge_data_sets():
+    """Temporary / Minor function to merge the multiple csv files into a single csv
+    """
+    import glob
+    import pandas as pd
+
+    path =r'/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/Meter_ids_thresholded'
+    all_files = glob.glob(path + "/*.csv")
+
+    li = []
+
+    for filename in all_files:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+
+    frame = pd.concat(li, axis=0, ignore_index=True)
+    frame.to_csv("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/merged_meter_ids.csv", sep=";")
+
+
+
 if __name__ == "__main__":
     dataset_path = "/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/gridtx-dump.csv"
     df = load_dataset(dataset_path)
@@ -49,15 +81,6 @@ if __name__ == "__main__":
        'estimation', 'spot_price_no_vat', 'amount_no_vat',
        'vat_percent', 'meter_id', 'kwh_fee_no_vat']]
 
-    import pandas as pd
-
-    print(df.head())
-    unique_meter_ids = df["meter_id"].unique().map_partitions(pd.Series.unique).compute()
-
-    print(len(unique_meter_ids))
     
-    print(f"Creating datasets for unique meter_ids: \n {unique_meter_ids}")
-    for meter in unique_meter_ids:
-        split_dataset(meter)
     
 

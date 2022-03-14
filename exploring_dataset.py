@@ -22,6 +22,8 @@ df_main = pd.read_csv('/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/mete
 df_whole = load_dataset("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/gridtx-dump.csv")
 
 def plot_timeslot():
+    """Plot Hourly, Weekly, Monthly and Weekday production, consumption and elcert
+    """
     df_copy = df_main
     print(df_copy.columns)
 
@@ -74,6 +76,8 @@ def plot_timeslot():
     plt.show();
 
 def describe_whole_dataset():
+    """Print missing values and Meter ID Value count
+    """
     df_copy = df_whole
     print("Missing values in the dataset based on columns:")
     nans = df_copy.isnull().sum().compute()
@@ -85,10 +89,15 @@ def describe_whole_dataset():
     print(value_counts_)
 
 def distribution_of_measurements():
+    """Plot Distribution of Meter ID Observations
+    """
     df_copy = df_whole
     value_counts_ = df_copy["meter_id"].value_counts().compute()
     plot = px.histogram(value_counts_, x="meter_id")
+    plot2 = px.box(value_counts_, y="meter_id")
+    
     plot.show();
+    plot2.show();
 
 if __name__ == "__main__":
     distribution_of_measurements()

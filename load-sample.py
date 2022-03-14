@@ -1,4 +1,7 @@
 # Python script to load the dataset
+from pandas import value_counts
+
+
 def load_dataset(fp):
     """Takes the filepath of our dataset and returns a Dask Dataframe
 
@@ -23,9 +26,20 @@ if __name__ == "__main__":
     df = load_dataset(dataset_path)
     df = df.sort_values(by=["meter_id"])
 
-    meter1 = df.loc[df["meter_id"] == "007039d0-81e5-4d4f-b300-a27a4f0b6512"]
-    meter1_production = meter1.loc[meter1["type"] == "production"]
+    threshold = 100
+
+    value_counts_ = df["meter_id"].value_counts()
+    unique_meter_ids_as_frame = value_counts_.to_frame("count").reset_index().rename(columns={"index": 'meter-ids'})
+
+    print(unique_meter_ids_as_frame)
+
+    meter_ids_thresholded = unique_meter_ids_as_frame[unique_meter_ids_as_frame["count"] > threshold]
 
     
+    # print(meter_ids_thresholded[0:3])
+    
+    # for meter in meter_ids_thresholded:
+    #     print(meter)
+
     # print(meter1_production)
     
