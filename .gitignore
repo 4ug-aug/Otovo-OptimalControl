@@ -3,11 +3,14 @@ bin-debug/
 bin-release/
 [Oo]bj/
 [Bb]in/
+/venv
 
 # Other files and folders
 .settings/
 /otovo
 /data
+/config
+/__pycache__
 
 # Executables
 *.swf
