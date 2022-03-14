@@ -1,0 +1,13 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+We load the data as a table.
+
+```{r}
+data <- read.table("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/merged_meter_ids.csv", sep = ";")
+```
+
+
+
