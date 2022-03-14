@@ -6,8 +6,32 @@ output: html_notebook
 We load the data as a table.
 
 ```{r}
-data <- read.table("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/merged_meter_ids.csv", sep = ";")
+data <- read.csv("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/merged_meter_ids.csv", sep = ";",
+                   header = TRUE)
 ```
 
+We need to rename the columns since they have somewhat arbitrary names now
+```{r}
+data <- within(data, rm("X"))
+head(data)
+colnames(data)
+```
+
+We need to filter on type
+```{r}
+num_kwh_prod <- data[data$type == "production",]
+num_kwh_cons <- data[data$type == "consumption",]
+num_kwh_elcert <- data[data$type == "elcert",]
+```
+
+We make some preliminary statistics and plotting
+```{r}
+# library("GLDEX")
+# var <- fun.zero.omit(num_kwh_prod$num_kwh)
+var <- num_kwh_prod$num_kwh
+hist(var)
+boxplot(var)
+
+```
 
 
