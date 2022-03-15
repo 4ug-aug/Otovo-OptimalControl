@@ -24,7 +24,7 @@ def s3_list_files():
     
     return files
 
-def s3_download(obj_name, fp):
+def s3_download_file(obj_name, fp):
     """Download a file from an S3 bucket
 
     :param file_name: File to upload
@@ -52,8 +52,12 @@ def s3_upload_file(file_name, bucket, object_name=None):
         return False
     return True
 
+def s3_delete_file(file_name):
+    s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
+
 
 if __name__ == "__main__":
-    # s3_upload_file("data/grid-metering-point-dump-plus-zipcode-GMAPS.csv", BUCKET_NAME, object_name="grid-metering-point-dump-plus-zipcode-GMAPS.csv")
-    # print(s3_list_files())
-    s3_download("grid-metering-point-dump-plus-zipcode-GMAPS.csv", 'grid-metering-point-dump-plus-zipcode-GMAPS.csv')
+    print(s3_list_files())
+    # s3_upload_file("data/grid-metering-point-dump-plus-zipcode.csv.gz", BUCKET_NAME, object_name="data/grid-metering-point-dump-plus-zipcode.csv.gz")
+    # s3_delete_file('grid-metering-point-dump-plus-zipcode-GMAPS.csv')
+    # s3_download_file("grid-metering-point-dump-plus-zipcode-GMAPS.csv", 'data/grid-metering-point-dump-plus-zipcode-GMAPS.csv')
