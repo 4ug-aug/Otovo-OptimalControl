@@ -1,5 +1,11 @@
 import boto3
 
+
+# Download aws CLI: https://aws.amazon.com/cli/
+# Then run:
+# aws configure
+# And enter credentials 
+
 BUCKET_NAME = 'otovo-student-optimalcontrol'
 s3 = boto3.client("s3")
 
