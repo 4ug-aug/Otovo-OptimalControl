@@ -6,7 +6,7 @@ output: html_notebook
 We load the data as a table.
 
 ```{r}
-data <- read.csv("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/merged_meter_ids.csv", sep = ";",
+data <- read.csv("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Project-Work---Bsc.-AIDS/Data/merged_meter_ids.csv", sep = ";",
                    header = TRUE)
 ```
 
@@ -14,8 +14,117 @@ We need to rename the columns since they have somewhat arbitrary names now
 ```{r}
 data <- within(data, rm("X"))
 head(data)
-colnames(data)
 ```
+
+
+Next we want to create a subset and count the occurrences within each hour for each
+meter-id. If we do this we can calculate the correlation matrix between the 
+meter-ids and therefore get which meters have the same amount of observations in
+same intervals.
+
+
+```{r}
+
+# test <- "2018-04-26 16:34:10.145628+02"
+# as.POSIXct(test,format="%Y-%m-%d %H:%M:%S", tz = "GMT")
+
+#subset <- data[c("meter_id","created_at")]
+#subset$created_at <- as.POSIXct(gsub("\\.[0-9]+02", "", subset$created_at),  #subset$created_at, format="%Y-%m-%d %H:%M:%S", tz = "GMT")
+#subset$interval <- cut(subset$created_at, breaks = "1 hour")
+
+subset <- data[c("meter_id","timeslot")]
+subset$timeslot <- as.POSIXct(gsub("\\.02", "", subset$timeslot),  subset$timeslot, format="%Y-%m-%d %H:%M:%S", tz = "GMT")
+subset$interval <- cut(subset$timeslot, breaks = "1 day")
+subset
+
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+subset <- subset %>% expand(meter_id, timeslot) %>% left_join(subset)
+subset
+count_df <- count(subset, meter_id, interval, .drop=FALSE)
+count_df
+```
+
+
+We now have the count of observations for each meter-id in a one hour time interval.
+We can then split them into seperate dataframes.
+
+
+```{r}
+diff_meter_ids <- split(count_df, count_df$meter_id)
+length(diff_meter_ids)
+diff_meter_ids[10]
+```
+
+We get the count column for all the different meter ids.
+
+```{r}
+count_list <- lapply(diff_meter_ids,"[","n")
+length(count_list)
+```
+
+We rename the columns.
+
+```{r}
+library(purrr)
+df <- as.data.frame(as.data.frame(count_list))
+df <- df %>% 
+    set_names(c(seq_along(df)))
+dim(df)
+df
+```
+
+## JUST FOR TIMESLOT ##
+We remove n2 and n9 since they have data from way to early, furthermore we remove
+all rows with pure 0's.
+```{r}
+df <- within(df, rm("3","10"))
+print("dim before removing 0 rows:")
+print(dim(df))
+df <- df[apply(df[,-1], 1, function(x) !all(x==0)),]
+print("dim after removing 0 rows:")
+print(dim(df))
+df
+```
+
+
+
+We now have the dataframe with columns for each meter_id and the count for each
+interval as rows.
+We can then compute the correlation matrix.
+
+```{r}
+correlation_matrix <- cor(df)
+class(correlation_matrix)
+correlation_matrix
+```
+
+We can then get the maximum correlation indexes. 
+
+```{r}
+library(data.table)
+correlation_list <- setDT(reshape2::melt(correlation_matrix))[Var1 != Var2, .SD[which.max(value)], keyby=Var1]
+correlation_list <- correlation_list[order(-value),]
+correlation_list
+```
+Above we see an ordered list of correlations between the different meter_ids.
+
+```{r}
+library(corrplot)
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(correlation_matrix, method="color", col=col(200),  
+         type="upper", order="hclust",
+         tl.col="black", tl.srt=90, #Text label color and rotation
+         diag=FALSE,
+         tl.cex = 0.5
+         )
+```
+
+
 
 We need to filter on type
 ```{r}
@@ -29,9 +138,13 @@ We make some preliminary statistics and plotting
 # library("GLDEX")
 # var <- fun.zero.omit(num_kwh_prod$num_kwh)
 var <- num_kwh_prod$num_kwh
-hist(var)
+hist(var, breaks = 30)
 boxplot(var)
 
+
+```
+```{r}
+hist(var[var < 0])
 ```
 
 
