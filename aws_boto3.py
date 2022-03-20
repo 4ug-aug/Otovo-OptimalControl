@@ -1,9 +1,14 @@
 import boto3
 
+# Download aws CLI: https://aws.amazon.com/cli/
+# Then run:
+# aws configure
+# And enter credentials 
+
 BUCKET_NAME = 'otovo-student-optimalcontrol'
 s3 = boto3.client("s3")
 
-def list_files():
+def s3_list_files():
     """ List files in AWS Bucket
     
     Returns:
@@ -19,14 +24,14 @@ def list_files():
     
     return files
 
-def download(obj_name, fp):
+def s3_download_file(obj_name, fp):
     """Download a file from an S3 bucket
 
     :param file_name: File to upload
     """
     s3.download_file(BUCKET_NAME, obj_name, fp)
     
-def upload_file(file_name, bucket, object_name=None):
+def s3_upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
 
     :param file_name: File to upload
@@ -47,8 +52,12 @@ def upload_file(file_name, bucket, object_name=None):
         return False
     return True
 
+def s3_delete_file(file_name):
+    s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
+
 
 if __name__ == "__main__":
-    # upload_file("data/grid-metering-point-dump-plus-zipcode-GMAPS.csv", BUCKET_NAME, object_name="grid-metering-point-dump-plus-zipcode-GMAPS.csv")
-    # print(list_files())
-    download("grid-metering-point-dump-plus-zipcode-GMAPS.csv", 'grid-metering-point-dump-plus-zipcode-GMAPS.csv')
+    print(s3_list_files())
+    # s3_upload_file("data/grid-metering-point-dump-plus-zipcode.csv.gz", BUCKET_NAME, object_name="data/grid-metering-point-dump-plus-zipcode.csv.gz")
+    # s3_delete_file('grid-metering-point-dump-plus-zipcode-GMAPS.csv')
+    # s3_download_file("grid-metering-point-dump-plus-zipcode-GMAPS.csv", 'data/grid-metering-point-dump-plus-zipcode-GMAPS.csv')
