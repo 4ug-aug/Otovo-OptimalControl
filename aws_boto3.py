@@ -58,6 +58,6 @@ def s3_delete_file(file_name):
 
 if __name__ == "__main__":
     print(s3_list_files())
-    # s3_upload_file("data/grid-metering-point-dump-plus-zipcode.csv.gz", BUCKET_NAME, object_name="data/grid-metering-point-dump-plus-zipcode.csv.gz")
-    # s3_delete_file('grid-metering-point-dump-plus-zipcode-GMAPS.csv')
-    # s3_download_file("grid-metering-point-dump-plus-zipcode-GMAPS.csv", 'data/grid-metering-point-dump-plus-zipcode-GMAPS.csv')
+    s3_upload_file("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/random-meter-ids.csv", 
+                    BUCKET_NAME, 
+                    object_name="data/random-meter-ids")

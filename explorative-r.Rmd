@@ -6,8 +6,11 @@ output: html_notebook
 We load the data as a table.
 
 ```{r}
+library(dplyr)
+library(tidyr)
 data <- read.csv("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Project-Work---Bsc.-AIDS/Data/merged_meter_ids.csv", sep = ";",
                    header = TRUE)
+data <- data[data$type == "production",]
 ```
 
 We need to rename the columns since they have somewhat arbitrary names now
@@ -40,9 +43,6 @@ subset
 ```
 
 ```{r}
-library(dplyr)
-library(tidyr)
-
 subset <- subset %>% expand(meter_id, timeslot) %>% left_join(subset)
 subset
 count_df <- count(subset, meter_id, interval, .drop=FALSE)
@@ -72,6 +72,7 @@ We rename the columns.
 ```{r}
 library(purrr)
 df <- as.data.frame(as.data.frame(count_list))
+dim(df)
 df <- df %>% 
     set_names(c(seq_along(df)))
 dim(df)
@@ -79,7 +80,7 @@ df
 ```
 
 ## JUST FOR TIMESLOT ##
-We remove n2 and n9 since they have data from way to early, furthermore we remove
+We remove n2 and n9 since they have data from way too early, furthermore we remove
 all rows with pure 0's.
 ```{r}
 df <- within(df, rm("3","10"))

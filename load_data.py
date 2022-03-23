@@ -1,16 +1,18 @@
 # Python script to load the dataset
 
-def load_dataset(fp):
-    """Takes the filepath of our dataset and returns a Dask Dataframe
+def load_dataset(fp, type=None):
+    """Takes the filepath of our dataset and returns a either a Dask or Pandas Dataframe
 
     Args:
-        fp (str): filepath for the dataset
+        fp (str):   filepath for the dataset
+        type (str): 'pandas' or 'dask'
 
     Returns:
         object: iterable of our dataset
     """
 
     import dask.dataframe as dd
+    import pandas as pd
     
     print(f"load_dataset - Filepath: {fp}")
 
@@ -19,11 +21,19 @@ def load_dataset(fp):
        'invoice_item_id': 'object',
        'parent_id': 'object'}
 
-    df = dd.read_csv(fp, sep=";", dtype=dtype)
-    print("Loaded dataset to Dask DataFrame")
-    return df
+    if type == "dask":
 
-def split_dataset(meter_id):
+        df = dd.read_csv(fp, sep=";", dtype=dtype)
+        print("Loaded dataset to Dask DataFrame")
+        return df
+    elif type == "pandas":
+        df = pd.read_csv(fp, sep=";", dtype=dtype)
+        print("Loaded dataset to Pandas DataFrame")
+        return df
+    else:
+        print(f"Invalid choice: {type}, choose between pandas or dask")
+
+def split_dataset(df, meter_id):
     """ Get a meter_id and create and save a new dataframe based on that
 
     Args:
@@ -32,7 +42,7 @@ def split_dataset(meter_id):
 
     df_meter_id = df[df["meter_id"] == meter_id]
     print(f"Creating new csv for meter: {meter_id}")
-    df_meter_id.to_csv(f"/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/{meter_id}.csv", index= None, header = True,
+    df_meter_id.to_csv(f"{meter_id}.csv", index= None, header = True,
     single_file=True)
 
     return None
@@ -53,34 +63,35 @@ def create_datasets_from_meter_id():
     for meter in tqdm(meter_ids_thresholded):
         split_dataset(meter)
 
-def merge_data_sets():
+def merge_data_sets(fp, name):
     """Temporary / Minor function to merge the multiple csv files into a single csv
     """
     import glob
     import pandas as pd
+    from tqdm import tqdm
 
-    path =r'/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/Meter_ids_thresholded'
+    path = fp
     all_files = glob.glob(path + "/*.csv")
 
     li = []
 
-    for filename in all_files:
+    for filename in tqdm(all_files):
         df = pd.read_csv(filename, index_col=None, header=0)
         li.append(df)
 
     frame = pd.concat(li, axis=0, ignore_index=True)
-    frame.to_csv("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/merged_meter_ids.csv", sep=";")
+    frame.to_csv(f"/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/{name}.csv", sep=";")
 
 
 
 if __name__ == "__main__":
-    dataset_path = "/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/gridtx-dump.csv"
-    df = load_dataset(dataset_path)
+    dataset_path = "/Users/augusttollerup/Documents/SEM4/Fagprojekt/Project-Work---Bsc.-AIDS/Data/merged_meter_ids.csv"
+    df = load_dataset(dataset_path, type="pandas")
     # Create new dataset with only columns
-    df = df[['created_at', 'updated_at', 'num_kwh', 'timeslot', 'type',
-       'estimation', 'spot_price_no_vat', 'amount_no_vat',
-       'vat_percent', 'meter_id', 'kwh_fee_no_vat']]
+    df = df[['meter_id', 'created_at', 'timeslot']]
 
+    df = df.sort_values("meter_id")
+    print(df.head())
     
     
 

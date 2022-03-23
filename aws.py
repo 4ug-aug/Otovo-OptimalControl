@@ -41,11 +41,11 @@ async def s3_upload_file(client: AsyncClient):
 async def main():
     async with AsyncClient(timeout=30) as client:
         await s3_list_files(client)
-        await s3_download_file("grid-metering-point-dump-plus-zipcode.csv.gz", client)
+        await s3_get_download_url("grid-metering-point-dump-plus-zipcode.csv.gz", client)
         # s3_upload_file(client)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    print(asyncio.run(main()))
     
 
     # Upload a new file to aws
