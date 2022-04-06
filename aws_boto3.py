@@ -1,4 +1,5 @@
 import boto3
+from pprint import pprint
 
 # Download aws CLI: https://aws.amazon.com/cli/
 # Then run:
@@ -27,7 +28,8 @@ def s3_list_files():
 def s3_download_file(obj_name, fp):
     """Download a file from an S3 bucket
 
-    :param file_name: File to upload
+    :param obj_name:        File to download
+    :param fp:              Name of new file
     """
     s3.download_file(BUCKET_NAME, obj_name, fp)
     
@@ -55,9 +57,18 @@ def s3_upload_file(file_name, bucket, object_name=None):
 def s3_delete_file(file_name):
     s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
 
-
+# Let script take arguments
 if __name__ == "__main__":
-    print(s3_list_files())
-    s3_upload_file("/Users/augusttollerup/Documents/SEM4/Fagprojekt/Data/random-meter-ids.csv", 
-                    BUCKET_NAME, 
-                    object_name="data/random-meter-ids")
+    import argparse
+    parser = argparse.ArgumentParser(description='Download files from AWS S3')
+    parser.add_argument('-m', '--mode', type=str, default='list', help='Mode of operation: list, download, upload', required=True)
+    parser.add_argument('--file', type=str, help='File to download', required=True)
+    parser.add_argument('--bucket', type=str, help='Bucket to download from', required=False)
+    parser.add_argument('--out', type=str, help='Output file name', required=True)
+    args = parser.parse_args()
+
+    if args.mode == "download" and args.file is not None:
+        s3_download_file(args.file, args.out)
+
+    elif args.mode == "upload" and args.file is not None:
+        s3_upload_file(args.file, args.bucket, args.out)
