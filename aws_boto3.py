@@ -57,14 +57,14 @@ def s3_upload_file(file_name, bucket, object_name=None):
 def s3_delete_file(file_name):
     s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
 
-# Let script take arguments
+# Run script with arguments
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Download files from AWS S3')
-    parser.add_argument('-m', '--mode', type=str, default='list', help='Mode of operation: list, download, upload', required=True)
+    parser.add_argument('-m', '--mode', type=str, default='download', help='Mode of operation: download, upload', required=True)
     parser.add_argument('--file', type=str, help='File to download', required=True)
     parser.add_argument('--bucket', type=str, help='Bucket to download from', required=False)
-    parser.add_argument('--out', type=str, help='Output file name', required=True)
+    parser.add_argument('--out', type=str, help='Output file name')
     args = parser.parse_args()
 
     if args.mode == "download" and args.file is not None:
