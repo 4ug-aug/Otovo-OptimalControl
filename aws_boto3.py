@@ -9,6 +9,22 @@ from pprint import pprint
 BUCKET_NAME = 'otovo-student-optimalcontrol'
 s3 = boto3.client("s3")
 
+# Progress class from: https://brodan.biz/blog/logging-s3-download-progress-with-python-and-boto3/
+class S3DownloadLogger(object):
+    def __init__(self, file_size, filename):
+        self._filename = filename
+        self._size = file_size
+        self._seen_so_far = 0
+        # Create list from 0 to 100
+        self._seen_percentages = {x: False for x in range(0, 100, 5)}
+
+    def __call__(self, bytes_amount):
+        self._seen_so_far += bytes_amount
+        percentage = round((self._seen_so_far / int(self._size)) * 100)
+        if percentage in self._seen_percentages.keys() and not self._seen_percentages[percentage]:
+            self._seen_percentages[percentage] = True
+            print(f"Download progress for '{self._filename}': {percentage}%")
+
 def s3_list_files():
     """ List files in AWS Bucket
     
@@ -25,13 +41,13 @@ def s3_list_files():
     
     return files
 
-def s3_download_file(obj_name, fp):
+def s3_download_file(obj_name, fp, Callback=None):
     """Download a file from an S3 bucket
 
     :param obj_name:        File to download
     :param fp:              Name of new file
     """
-    s3.download_file(BUCKET_NAME, obj_name, fp)
+    s3.download_file(BUCKET_NAME, obj_name, fp, Callback=Callback)
     
 def s3_upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -69,7 +85,9 @@ if __name__ == "__main__":
 
     if args.mode == "download" and args.file is not None:
         print("Downloading file: {}".format(args.file))
-        s3_download_file(args.file, args.out)
+        remote_file = s3.get_object(Bucket = BUCKET_NAME, Key = args.file)
+        download_logger = S3DownloadLogger(remote_file["ResponseMetadata"]["HTTPHeaders"]["content-length"], args.file)
+        s3_download_file(args.file, args.out, Callback=download_logger)
         print("Download complete")
 
     elif args.mode == "upload" and args.file is not None:
