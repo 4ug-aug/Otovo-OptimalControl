@@ -61,17 +61,21 @@ def s3_delete_file(file_name):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Download files from AWS S3')
-    parser.add_argument('-m', '--mode', type=str, default='download', help='Mode of operation: download, upload', required=True)
+    parser.add_argument('-m', '--mode', type=str, default='download', help='Mode of operation: download, upload, list', required=True)
     parser.add_argument('--file', type=str, help='File to download', required=False)
     parser.add_argument('--bucket', type=str, help='Bucket to download from', required=False)
     parser.add_argument('--out', type=str, help='Output file name')
     args = parser.parse_args()
 
     if args.mode == "download" and args.file is not None:
+        print("Downloading file: {}".format(args.file))
         s3_download_file(args.file, args.out)
+        print("Download complete")
 
     elif args.mode == "upload" and args.file is not None:
+        print("Uploading file: {}".format(args.file))
         s3_upload_file(args.file, args.bucket, args.out)
+        print("Upload complete")
 
     elif args.mode == "list": 
         print(*s3_list_files(),sep='\n')
