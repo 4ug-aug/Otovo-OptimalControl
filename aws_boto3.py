@@ -78,7 +78,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Download files from AWS S3')
     parser.add_argument('-m', '--mode', type=str, default='download', help='Mode of operation: download, upload, list', required=True)
-    parser.add_argument('--file', type=str, help='File to download/upload', required=True)
+    parser.add_argument('--file', type=str, help='File to download/upload', required=False)
     parser.add_argument('--bucket', type=str, help='Bucket to download from', required=False)
     parser.add_argument('--out', type=str, help='Output file name', required=False)
     args = parser.parse_args()
