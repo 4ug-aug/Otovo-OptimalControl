@@ -78,9 +78,9 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Download files from AWS S3')
     parser.add_argument('-m', '--mode', type=str, default='download', help='Mode of operation: download, upload, list', required=True)
-    parser.add_argument('--file', type=str, help='File to download', required=False)
+    parser.add_argument('--file', type=str, help='File to download/upload', required=True)
     parser.add_argument('--bucket', type=str, help='Bucket to download from', required=False)
-    parser.add_argument('--out', type=str, help='Output file name')
+    parser.add_argument('--out', type=str, help='Output file name', required=False)
     args = parser.parse_args()
 
     if args.mode == "download" and args.file is not None:
@@ -92,7 +92,10 @@ if __name__ == "__main__":
 
     elif args.mode == "upload" and args.file is not None:
         print("Uploading file: {}".format(args.file))
-        s3_upload_file(args.file, args.bucket, args.out)
+        if args.bucket is None:
+            print("Bucket not specified, using default: {}".format(BUCKET_NAME))
+            args.bucket = BUCKET_NAME
+        s3_upload_file(args.file, args.bucket)
         print("Upload complete")
 
     elif args.mode == "list": 
