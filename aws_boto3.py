@@ -87,6 +87,9 @@ if __name__ == "__main__":
         print("Downloading file: {}".format(args.file))
         remote_file = s3.get_object(Bucket = BUCKET_NAME, Key = args.file)
         download_logger = S3DownloadLogger(remote_file["ResponseMetadata"]["HTTPHeaders"]["content-length"], args.file)
+        if args.out is None:
+            print("No out filename specified using: ", args.file)
+            args.out = args.file
         s3_download_file(args.file, args.out, Callback=download_logger)
         print("Download complete")
 
