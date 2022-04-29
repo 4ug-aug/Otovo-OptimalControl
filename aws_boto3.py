@@ -47,7 +47,7 @@ def s3_download_file(obj_name, fp, Callback=None):
     :param obj_name:        File to download
     :param fp:              Name of new file
     """
-    s3.download_file(BUCKET_NAME, obj_name, fp, Callback=Callback)
+    s3.download_file(BUCKET_NAME, obj_name, str(fp), Callback=Callback)
     
 def s3_upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
