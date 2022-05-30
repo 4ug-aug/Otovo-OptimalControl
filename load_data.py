@@ -1,6 +1,6 @@
 # Python script to load the dataset
 
-def load_dataset(fp, type=None):
+def load_dataset(fp, type=None, sep=";"):
     """Takes the filepath of our dataset and returns a either a Dask or Pandas Dataframe
 
     Args:
@@ -23,11 +23,11 @@ def load_dataset(fp, type=None):
 
     if type == "dask":
 
-        df = dd.read_csv(fp, sep=";", dtype=dtype)
+        df = dd.read_csv(fp, sep=sep, dtype=dtype)
         print("Loaded dataset to Dask DataFrame")
         return df
     elif type == "pandas":
-        df = pd.read_csv(fp, sep=";", dtype=dtype)
+        df = pd.read_csv(fp, sep=sep, dtype=dtype)
         print("Loaded dataset to Pandas DataFrame")
         return df
     else:
