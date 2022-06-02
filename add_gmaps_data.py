@@ -26,7 +26,7 @@ if path.exists(new_filepath):
 else:
     df = pd.read_csv(filepath)
         
-    df["full_address"] = df["name"] + ", Norway" if type(df["street_address"]) != "str" else df["street_address"] + ", " + df["name"] + ", Norway"
+    df["full_address"] = df["name"] + " " + str(df["code"]) + ", Norway" if type(df["street_address"]) != "str" else df["street_address"] + ", " + df["name"] + " " + str(df["code"]) + ", Norway"
 
     # df["full_address"] = df["street_address"] + ", " + df["name"] + ", Norway" 
     df["lat"] = np.nan
