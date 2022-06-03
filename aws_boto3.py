@@ -47,7 +47,7 @@ def s3_download_file(obj_name, fp, Callback=None):
     :param obj_name:        File to download
     :param fp:              Name of new file
     """
-    s3.download_file(BUCKET_NAME, obj_name, fp, Callback=Callback)
+    s3.download_file(BUCKET_NAME, obj_name, str(fp), Callback=Callback)
     
 def s3_upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -87,6 +87,9 @@ if __name__ == "__main__":
         print("Downloading file: {}".format(args.file))
         remote_file = s3.get_object(Bucket = BUCKET_NAME, Key = args.file)
         download_logger = S3DownloadLogger(remote_file["ResponseMetadata"]["HTTPHeaders"]["content-length"], args.file)
+        if args.out is None:
+            print("No out filename specified using: ", args.file)
+            args.out = args.file
         s3_download_file(args.file, args.out, Callback=download_logger)
         print("Download complete")
 
