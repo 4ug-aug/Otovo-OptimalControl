@@ -13,7 +13,12 @@ class Battery:
         self.current_capacity += amount
         
         if self.current_capacity > self.max_capacity:
+            yield_ = self.current_capacity - self.max_capacity
             self.current_capacity = self.max_capacity
+
+            return yield_
+        
+
         
     def discharge(self, amount: int) -> float:
         """Discharge battery
