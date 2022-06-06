@@ -18,8 +18,6 @@ class Battery:
 
             return yield_
         
-
-        
     def discharge(self, amount: int) -> float:
         """Discharge battery
             
@@ -45,4 +43,8 @@ class Battery:
         return self.current_capacity / self.max_capacity * 100
 
 
+def logic():
+    """_summary_
+    """
 
+    return None
