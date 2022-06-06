@@ -3,6 +3,7 @@ library(ggplot2)
 library(grid)
 library(TSstudio)
 library(TTR)
+library(graphics)
 
 hf_prod <- read.csv('prod.csv', sep=',', header=TRUE)
 hf_cons <- read.csv('cons.csv', sep=',', header=TRUE)
@@ -19,13 +20,15 @@ plot.ts(cons_ts)
 
 #smoothing
 
-plot.ts(SMA(cons_ts, n=10))
+plot.ts(SMA(cons_ts, n=90))
 plot.ts(SMA(prod_ts, n=90))
 
 # decompose
 
 consComp <- decompose(cons_ts)
 plot(consComp)
+
+plot(stl(cons_ts), s.window="periodic")
 
 prodComp <- decompose(prod_ts)
 plot(prodComp)
@@ -34,4 +37,9 @@ plot(prodComp)
 
 consAdj <- cons_ts - consComp$seasonal
 plot.ts(consAdj)
+
+# forecasting w ARIMA
+library(forecast)
+
+auto.arima(cons_ts)
 
