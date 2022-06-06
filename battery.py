@@ -1,8 +1,8 @@
 class Battery:
-    def __init__(self) -> None:
+    def __init__(self, current_capacity = 0, over_under_charge = 0) -> None:
         self.max_capacity = 100
-        self.current_capacity = 0
-        self.over_under_charge = 0
+        self.current_capacity = current_capacity
+        self.over_under_charge = over_under_charge
 
     def charge(self, amount: float) -> None:
         """Charge battery
