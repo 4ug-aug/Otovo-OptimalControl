@@ -11,6 +11,8 @@ bin-release/
 /data
 /config
 /__pycache__
+.Rhistory
+*.log
 
 # Executables
 *.swf
