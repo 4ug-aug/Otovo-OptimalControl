@@ -13,6 +13,8 @@ bin-release/
 /__pycache__
 .Rhistory
 *.log
+.vscode
+.ipynb_checkpoints
 
 # Executables
 *.swf
