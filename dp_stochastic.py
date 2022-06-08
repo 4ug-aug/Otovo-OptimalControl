@@ -136,10 +136,17 @@ class DPModel:
         return round(self.battery.get_current_capacity(), 0)
 
     def g(self, x, u, w, k):
-        # Calculate the charge rate
+        # We removed the upper bound of production on the action space
+        # This means we can buy more power than we are producing
+        # If we do this we need to add the amount we are buying to
+        # the amount we need to buy, I.e the demand
+        prod = self.prod.iloc[k].values[0]
+        demand = self.demand.iloc[k].values[0]
+
         rt = (self.f(x, u, True, k) - x)
-        nt = (self.demand.iloc[k].values[0] - self.prod.iloc[k].values[0]) + rt
-        potential_saving = self.demand.iloc[k].values[0] - self.prod.iloc[k].values[0]
+        potential_saving = demand - prod
+        nt = (demand - prod) + rt
+
         h = self.demand.index[k].hour
 
         if nt > 0:
@@ -163,7 +170,7 @@ class DPModel:
         production = self.prod.iloc[k].values[0]
         max_discharge = 7
         lower_bound = -min(max_discharge, x) if x > 0 else 0
-        # The upper bound is the rest of the battery capacity
+        # The upper bound is defined based on the max amount we are allowed to discharge and the amount we can charge
         upper_bound = min(production, max_discharge, self.battery.max_capacity - x)
         return np.arange(lower_bound, upper_bound+1, 1)
 
@@ -244,7 +251,7 @@ if __name__ == "__main__":  # Test dp on small graph given in (Her21, Subsection
     import json
     from tqdm import tqdm
 
-    print("Testing the deterministic DP algorithm on the small graph old")
+    print("Testing the deterministic DP algorithm on the Battery Control problem")
 
     # N, battery_model, demand, prod, sp
     battery_model = Battery(max_capacity=13.0)
@@ -263,8 +270,8 @@ if __name__ == "__main__":  # Test dp on small graph given in (Her21, Subsection
         if int(key) in peak_hours:
             hour_lookup_price[key] = value * 1.8
 
-    series_prod = get_series("28ba7f57-6e83-4341-8078-232c1639e4e3", "prod", start="2016-09-04 22:00:00+00:00", end = "2019-05-14 21:00:00+00:00")[:100]
-    series_cons = get_series("28ba7f57-6e83-4341-8078-232c1639e4e3", "cons", start="2016-09-04 22:00:00+00:00", end = "2019-05-14 21:00:00+00:00")[:100]
+    series_prod = get_series("28ba7f57-6e83-4341-8078-232c1639e4e3", "prod", start="2016-09-04 22:00:00+00:00", end = "2019-05-14 21:00:00+00:00")[:12]
+    series_cons = get_series("28ba7f57-6e83-4341-8078-232c1639e4e3", "cons", start="2016-09-04 22:00:00+00:00", end = "2019-05-14 21:00:00+00:00")[:12]
 
     # Add possible predictions here
     model = DPModel(series_prod.shape[0], battery_model, series_cons, series_prod, hour_lookup_price)  # Instantiate the small graph with target node 5 
@@ -279,7 +286,7 @@ if __name__ == "__main__":  # Test dp on small graph given in (Her21, Subsection
     save = False    
 
     if save:
-        suffix = "mulitplied_peak"
+        suffix = "mulitplied_peak_buy_allowed"
         # Save J to a file
         with open(f'data/dp/J_small_graph_{suffix}.txt', 'w') as outfile:
             outfile.write(str(J))
@@ -295,14 +302,14 @@ if __name__ == "__main__":  # Test dp on small graph given in (Her21, Subsection
         with open(f'data/dp/actions_small_graph_{suffix}.txt', 'w') as outfile:
             outfile.write(str(actions))
 
-    # print(f"Path was", xp)
-    # print()
-    # print(f"Actions taken", actions)
-    # print()
-    # print(f"Cost of actions taken", [model.g(x, u, 0, k) for k, (x, u) in enumerate(zip(xp, actions))])
-    # print()
-    # print(series_prod - series_cons)
-    # print()
+    print(f"Path was", xp)
+    print()
+    print(f"Actions taken", actions)
+    print()
+    print(f"Cost of actions taken", [model.g(x, u, 0, k) for k, (x, u) in enumerate(zip(xp, actions))])
+    print()
+    print(series_prod - series_cons)
+    print()
     print(f"Actual cost of rollout was {J} which should obviously be similar to J_0[{s}]")
     # Remember to check optimal path agrees with the the (self-evident) answer from the figure.
 
