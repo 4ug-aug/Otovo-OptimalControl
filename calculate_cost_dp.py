@@ -32,7 +32,7 @@ for idx, action in enumerate(actions):
     # Get cost of action
     buy = action[0]
     sell = action[1]
-    cost += buy * price - sell * price*0.1
+    cost += buy * price + sell * price*0.1
     cost_list.append(cost)
 
 print(f"Cost: ", cost)
