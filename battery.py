@@ -3,23 +3,39 @@ class Battery:
         self.max_capacity = max_capacity
         self.current_capacity = current_capacity
         self.surplus_deficit = surplus_deficit
+        self.charge_list = []
+        self.discharge_list = []
+
 
     def charge(self, amount: float) -> float:
+        old_capacity = self.current_capacity
 
         self.current_capacity += amount
         self.surplus_deficit = 0
-        
+
         # We charge the battery
         if self.current_capacity >= self.max_capacity:
             self.surplus_deficit = self.current_capacity - self.max_capacity
             self.current_capacity = self.max_capacity
-
 
         # We discharge the battery
         elif self.current_capacity <= 0:
             # Return the amount of energy that was not discharged
             self.surplus_deficit = self.current_capacity
             self.current_capacity = 0
+
+        charge_discharge_amount = self.current_capacity - old_capacity
+
+        if charge_discharge_amount > 0:
+            self.charge_list.append(charge_discharge_amount)
+            self.discharge_list.append(0)
+        elif charge_discharge_amount < 0:
+            self.discharge_list.append(charge_discharge_amount)
+            self.charge_list.append(0)
+        else:
+            self.discharge_list.append(0)
+            self.charge_list.append(0)
+
 
 
     def get_surplus_deficit(self) -> float:
