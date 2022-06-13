@@ -5,41 +5,23 @@ library(TSstudio)
 library(TTR)
 library(graphics)
 
-hf_prod <- read.csv('prod.csv', sep=',', header=TRUE)
-hf_cons <- read.csv('cons.csv', sep=',', header=TRUE)
+data = read.csv('C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/gridtx-dump-AGGREGATED-CLEANED-THRESHOLD-COVERAGE100-NORMALIZED-CONS.csv', sep=',', header=TRUE)
+train <- data[1:962560,]
+test <- data[962561:962585,]
 
-# create time series
+firstHour_train <- 24*(as.Date("2016-09-05 00:00:00")-as.Date("2016-1-1 00:00:00")) # As suggested by Mark S
+firstHour_test <- 24*(as.Date("2019-05-10 23:00:00")-as.Date("2019-1-1 00:00:00")) # As suggested by Mark S
 
-prod_ts <- ts(hf_prod$num_kwh, start=c(2017,1),frequency=8760)
-#prod_ts <- ts(hf_prod$num_kwh, start=c(2016,9),frequency=8760)
-plot.ts(prod_ts)
+train.ts <- ts(train$num_kwh_normalized, start=c(2016,firstHour_train), frequency=24*365.25)
+test.ts <- ts(test$num_kwh_normalized, start=c(2019,firstHour_test), frequency=24*365.25)
 
-cons_ts <- ts(hf_cons$num_kwh, start=c(2017,1),frequency=8760)
-#cons_ts <- ts(hf_cons$num_kwh, start=c(2016,9),frequency=8760)
-plot.ts(cons_ts)
+#multiple seasonality
+y <- msts(train.ts, seasonal.periods= c(24,7*24, 365.25*24))
+fit <- tbats(y)
+fc <- forecast(fit)
 
-#smoothing
+# auto-arima
+fit <- auto.arima(train.ts, seasonal=TRUE, trace=TRUE)
+fc <-predict(fit, n.ahead=24, level=c(95))
 
-plot.ts(SMA(cons_ts, n=90))
-plot.ts(SMA(prod_ts, n=90))
-
-# decompose
-
-consComp <- decompose(cons_ts)
-plot(consComp)
-
-plot(stl(cons_ts), s.window="periodic")
-
-prodComp <- decompose(prod_ts)
-plot(prodComp)
-
-# seasonal shifting
-
-consAdj <- cons_ts - consComp$seasonal
-plot.ts(consAdj)
-
-# forecasting w ARIMA
-library(forecast)
-
-auto.arima(cons_ts)
 
