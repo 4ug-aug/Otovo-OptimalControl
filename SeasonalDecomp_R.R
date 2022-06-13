@@ -5,11 +5,11 @@ library(TSstudio)
 library(TTR)
 library(graphics)
 
-data = read.csv('C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/gridtx-dump-AGGREGATED-CLEANED-THRESHOLD-COVERAGE100-NORMALIZED-CONS.csv', sep=',', header=TRUE)
-train <- data[1:962560,]
+data = read.csv('C:/Users/alexa/datadump/Project-Work---Bsc.-AIDS/data/gridtx-dump-AGGREGATED-CLEANED-THRESHOLD-COVERAGE100-NORMALIZED-CONS.csv', sep=',', header=TRUE)
+train <- data[953800:962560,]
 test <- data[962561:962585,]
 
-firstHour_train <- 24*(as.Date("2016-09-05 00:00:00")-as.Date("2016-1-1 00:00:00")) # As suggested by Mark S
+firstHour_train <- 24*(as.Date("2019-05-04 3:00:00")-as.Date("2019-1-1 00:00:00")) # As suggested by Mark S
 firstHour_test <- 24*(as.Date("2019-05-10 23:00:00")-as.Date("2019-1-1 00:00:00")) # As suggested by Mark S
 
 train.ts <- ts(train$num_kwh_normalized, start=c(2016,firstHour_train), frequency=24*365.25)
