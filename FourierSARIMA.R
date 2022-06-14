@@ -24,7 +24,7 @@ forecasted <- c()
 f_upper_bounds <- c()
 f_lower_bounds <- c()
 
-for (i in 0:10){
+for (i in 0:547){
   
   d <- (iniTrain+step_size*i)
   e <- iniTrain-1
@@ -52,7 +52,7 @@ for (i in 0:10){
   
 }
 
-a <- data.frame(index=seq(1,length(data[1:length(forecasted),3])), actual= data[1:length(forecasted),12], forecasted=forecasted, UB=f_upper_bounds, LB=f_lower_bounds)
+a <- data.frame(index=seq(1,length(data[1:length(forecasted),3])), actual= data[1:length(forecasted),4], forecasted=forecasted, UB=f_upper_bounds, LB=f_lower_bounds)
 p = ggplot(a, aes(index)) + 
   geom_line(aes(y=actual, colour="actual")) +
   geom_line(aes(y=forecasted, colour="forecasted"))+
