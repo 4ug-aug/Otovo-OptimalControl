@@ -7,7 +7,7 @@ library(graphics)
 library(xts)
 library(reshape2)
 
-data = read.csv('C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/sorted_cons.csv', sep=',', header=TRUE)
+data = read.csv('C:/Use`rs/vidis/OneDrive/Desktop/Summer2022/Project Work/sorted_cons.csv', sep=',', header=TRUE)
 
 data = data[(data$timeslot>='2017-09-15 00:00:00+02'),]
 
