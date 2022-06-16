@@ -77,13 +77,16 @@ print(fc$method)
 
 
 
-a <- data.frame(index=seq(1,length(data[1:length(forecasted),3])), actual= data[1:length(forecasted),4], forecasted=forecasted, UB=f_upper_bounds, LB=f_lower_bounds)
-p = ggplot(a, aes(index)) + 
-  geom_line(aes(y=actual, colour="actual")) +
-  geom_line(aes(y=forecasted, colour="forecasted"))+
-  geom_ribbon(aes(ymin=LB, ymax=UB), alpha=0.2)+
-  labs(x='index', y='norm_consumption', color='Legend')+
-  scale_color_manual(name='Values', values = c('actual'='orange', 'forecasted'='blue') )
+library(reshape)
+
+a <- data.frame(index=seq(1,length(data[1:length(forecasted),3])), actual= data[1441:(length(forecasted)+1440),5], forecasted=forecasted, UB=f_upper_bounds, LB=f_lower_bounds)
+
+write.csv(a,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_SARIMA_cons.csv", row.names = FALSE)
+write.csv(MSEs,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_SARIMA_MSEs_cons.csv", row.names = FALSE)
+write.csv(method,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_SARIMA_method_cons.csv", row.names = FALSE)
+
+b <- melt(a, id.vars='index', variable_name='variable')
+p = ggplot(b, aes(x=index, y=ma(value, order=24, centre=TRUE), color=variable))+geom_line(alpha=0.5)+ guides(colour = guide_legend(override.aes = list(alpha = 1)))
 print(p)
 
 print(mean(sqrt(MSEs)))
