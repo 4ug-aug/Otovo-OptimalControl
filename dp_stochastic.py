@@ -152,6 +152,10 @@ class DPModel:
         saved = 0
         percentage_cut = 0.1
 
+        next_batter_charge = x +(buy + yield_kwh - sell)
+        charge_rate = next_batter_charge - x
+        yield_kwh += charge_rate
+
         if x + buy + yield_kwh > self.battery.max_capacity:
             sell_excess = (x + buy + yield_kwh) - self.battery.max_capacity
 
@@ -161,7 +165,7 @@ class DPModel:
         if buy == 0 and sell == 0 and yield_kwh > 0:
             saved = -yield_kwh*price
         
-        if buy > 0 and sell == 0 and yield_kwh == 0:
+        if buy == 0 and sell == 0 and yield_kwh == 0:
             saved = -x*price
         
         cost = buy*price + saved - (sell * price * percentage_cut + sell_excess * price * percentage_cut)
@@ -187,10 +191,6 @@ class DPModel:
         else:
             upper_bound_buy = self.battery.max_capacity - x
             lower_bound_buy = 0
-        
-        # Sell Upperbound Lowerbound
-        # upper_bound_sell = max(x, yield_, x + yield_)
-        # lower_bound_sell = 0
 
         if yield_ < 0:
             upper_bound_sell = 0
@@ -312,7 +312,7 @@ if __name__ == "__main__":  # Test dp on small graph given in (Her21, Subsection
     series_cons = get_series("e882f9a7-f1de-4419-9869-7339be303281", "cons")
 
     # Add possible predictions here
-    model = DPModel(series_prod.shape[0], battery_model, series_cons, series_prod, hour_lookup_price)  # Instantiate the small graph with target node 5 
+    model = DPModel(series_prod.shape[0], battery_model, series_cons.round(), series_prod.round(), hour_lookup_price)  # Instantiate the small graph with target node 5 
     J, pi = DP_stochastic(model)
     # Print all optimal cost functions J_k(x_k) 
 
