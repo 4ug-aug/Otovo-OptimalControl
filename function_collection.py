@@ -286,3 +286,124 @@ def exploring_dataset(df_fp, fp_df_whole):
         
         plot.show();
         plot2.show();
+
+def get_series(meter_id, type="prod", start=None, end=None, agg=None):
+    """Create Series from meter_id and type of data
+
+    Args:
+        meter_id (str): meter-id
+        type (str, optional): production or consumption of kwh. Defaults to "prod".
+        start (str, optional): timeslot to start series. Defaults to None.
+        end (str, optional): timeslot to end series. Defaults to None.
+        agg (str, optional): aggregation of data. One of day, week or month. Defaults to None.
+
+    Returns:
+        pd.series: series of filtered data
+    """
+    import pandas as pd
+    import numpy as np
+
+    print("Getting series for meter_id: {}".format(meter_id))
+
+    # if start not none
+    if start is not None:
+        # Convert to datetime
+        start = pd.to_datetime(start)
+    
+    # if end not none
+    if end is not None:
+        # Convert to datetime
+        end = pd.to_datetime(end)
+
+    if type == "prod":
+        df_return = df_prod[df_prod["meter_id"] == meter_id]
+        # Drop all columns but timeslot and num_kwh_normalized
+        df_return = df_return[['timeslot', 'num_kwh']]
+        # Set index to timeslot
+        # Filter on start and end
+        # Convert timeslot to datetime
+        df_return["timeslot"] = pd.to_datetime(df_return["timeslot"], utc=True)
+        if start is not None and end is not None:
+            print("Filtering on start and end: ", start, end)
+            try:
+                df_return = df_return[(df_return['timeslot'] >= start) & (df_return['timeslot'] <= end)]
+            except Exception as e:
+                print(e)
+                print("No data for this timeslot, timeslot might be incorrect format or out of range:")
+                print("Format and range for timeslot: ", df_return.index[0], " ", df_return.index[-1])
+                print("Format for input start: ", start)
+                print("Format for input end: ", end)
+                pass
+        elif start is not None:
+            print("Filtering on start: ", start)
+            try:
+                df_return = df_return[(df_return['timeslot'] >= start)]
+            except:
+                print("No data for this timeslot, timeslot might be incorrect format or out of range:")
+                print("Format and range for timeslot: ", df_return.index[0], " ", df_return.index[-1])
+                print("Format for input start: ", start)
+                pass
+        elif end is not None:
+            print("Filtering on end: ", end)
+            try:
+                df_return = df_return[(df_return['timeslot'] <= end)]
+            except:
+                print("No data for this timeslot, timeslot might be incorrect format or out of range:")
+                print("Format and range for timeslot: ", df_return.index[0], " ", df_return.index[-1])
+                print("Format for input end: ", end)
+                pass
+
+    elif type == "cons":
+        df_return = df_cons[df_cons["meter_id"] == meter_id]
+        # Drop all columns but timeslot and num_kwh_normalized
+        df_return = df_return[['timeslot', 'num_kwh']]
+        # Set index to timeslot
+        # Filter on start and end
+        # Convert timeslot to datetime
+        df_return["timeslot"] = pd.to_datetime(df_return["timeslot"], utc=True)
+        if start is not None and end is not None:
+            print("Filtering on start and end: ", start, end)
+            try:
+                df_return = df_return[(df_return['timeslot'] >= start) & (df_return['timeslot'] <= end)]
+            except Exception as e:
+                print(e)
+                print("No data for this timeslot, timeslot might be incorrect format or out of range:")
+                print("Format and range for timeslot: ", df_return.index[0], " ", df_return.index[-1])
+                print("Format for input start: ", start)
+                print("Format for input end: ", end)
+                pass
+        elif start is not None:
+            print("Filtering on start: ", start)
+            try:
+                df_return = df_return[(df_return['timeslot'] >= start)]
+            except:
+                print("No data for this timeslot, timeslot might be incorrect format or out of range:")
+                print("Format and range for timeslot: ", df_return.index[0], " ", df_return.index[-1])
+                print("Format for input start: ", start)
+                pass
+        elif end is not None:
+            print("Filtering on end: ", end)
+            try:
+                df_return = df_return[(df_return['timeslot'] <= end)]
+            except:
+                print("No data for this timeslot, timeslot might be incorrect format or out of range:")
+                print("Format and range for timeslot: ", df_return.index[0], " ", df_return.index[-1])
+                print("Format for input end: ", end)
+                pass
+
+    df_return = df_return.set_index("timeslot").sort_index()
+
+    # If agg is not none
+    if agg is not None:
+        if agg == "day":
+            df_return = df_return.resample("D").sum()
+        elif agg == "week":
+            df_return = df_return.resample("W").sum()
+        elif agg == "month":
+            df_return = df_return.resample("M").sum()
+        else:
+            print("Aggregation not supported")
+            return None
+
+    # Return series
+    return df_return
