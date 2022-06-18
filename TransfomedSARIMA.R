@@ -53,14 +53,41 @@ for (i in 0:545){
   print(i)
   print(c(mse, mean(MSEs)))
   print(fc$method)
-  print(p_value)
+  print(dummy$p.value)
   
 }
+
+
+p_value=p_value[-length(p_value)]
+fc <- forecast(fit, h=23, level=c(95))
+dummy <- checkresiduals(fit, plot=F)
+p_value <- append(p_value, dummy$p.value)
+x <- data.frame(cbind((test$num_kwh)^(1/3)), (fc$mean), (fc$lower),(fc$upper))
+p = ggplot()+geom_line(data=x, aes(x = seq(1,23), y=x[,1], colour='actual'))+geom_line(data=x, aes(x = seq(1,23),y=x[,2], colour='forecasted'))+geom_line(data=x, aes(x = seq(1,23),y=x[,3], colour='lower bound'))+geom_line(data=x, aes(x = seq(1,23),y=x[,4], color='upper bound'))+labs(color = "Value")
+print(p)
+mse <- (1/nrow(x))*sum((((x[,1])^3)-((x[,2])^3))^2)
+MSEs <- append(MSEs, mse)
+method <- append(method, fc$method)
+forecasted <- append(forecasted, fc$mean)
+f_upper_bounds <- append(f_upper_bounds, fc$upper)
+f_lower_bounds <- append(f_lower_bounds, fc$lower)
+
+print(i)
+print(c(mse, mean(MSEs)))
+print(fc$method)
+print(dummy$p.value)
+
+
+
+
+
+
 a <- data.frame(index=seq(1,length(data[1:length(forecasted),3])), actual= data[1441:(length(forecasted)+1440),5], forecasted=forecasted, UB=f_upper_bounds, LB=f_lower_bounds)
 
-write.csv(a,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_SARIMA_cons.csv", row.names = FALSE)
-write.csv(MSEs,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_SARIMA_MSEs_cons.csv", row.names = FALSE)
-write.csv(method,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_SARIMA_method_cons.csv", row.names = FALSE)
+write.csv(a,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_trans_SARIMA_predictions_cons.csv", row.names = FALSE)
+write.csv(MSEs,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_trans_SARIMA_MSEs_cons.csv", row.names = FALSE)
+write.csv(method,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_trans_SARIMA_parameters_cons.csv", row.names = FALSE)
+write.csv(p_value,"C:/Users/vidis/OneDrive/Desktop/Summer2022/Project Work/final_p_values.csv", row.names = FALSE)
 
 b <- melt(a, id.vars='index', variable_name='variable')
 p = ggplot(b, aes(x=index, y=ma(value, order=24, centre=TRUE), color=variable))+geom_line(alpha=0.5)+ guides(colour = guide_legend(override.aes = list(alpha = 1)))
